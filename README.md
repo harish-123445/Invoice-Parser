@@ -50,7 +50,6 @@ To test the API, use the following `curl` command to send a PDF invoice for proc
 
 ```bash
 curl -X POST http://127.0.0.1:5000/process-invoice \
-     -H "Content-Type: multipart/form-data" \
      -F "file=@path_to_your_invoice.pdf"
 ```
 
