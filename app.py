@@ -104,7 +104,7 @@ class PDFInvoiceOCRParser:
         Please analyze the provided invoice image using OCR technology and extract the following information in a structured JSON format:
         Required Fields
 
-        -Invoice Number (also extract ACK NO if present, as Invoice Number)
+        -Invoice Number
         -Invoice Date
         -Due Date
         -Vendor Name
@@ -119,7 +119,7 @@ class PDFInvoiceOCRParser:
         -Payment Method (if available)
         -Sales Order Number (if available)
         -Buyer Order Number (if available)
-        -Purchase Order Number (also labeled as PO Number or Buyer Order Number)
+        -Purchase Order Number (also labeled as PO Number)
 
         Extract all PO numbers, whether digital or handwritten. If multiple PO numbers exist, return them as a list
         -Invoice URL (if available)
