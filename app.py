@@ -101,33 +101,35 @@ class PDFInvoiceOCRParser:
         
         # Prepare the prompt for Gemini
         prompt = """
-        Analyze this invoice image using OCR and extract the following information in a structured format:
-        - Invoice Number 
-            - if ACK NO return them as a Invoice Number
-        - Invoice Date
-        - Due Date
-        - Vendor Name
-        - Vendor Address
-        - Customer/Client Name
-        - Customer/Client Address
-        - Line Items (with quantity, description, unit price, Tax Price and total price)
-        - Subtotal
-        - Tax Amount
-        - Total Amount Due
-        - Payment Terms
-        - Payment Method (if available)
-        - Sales Order number (if available)
-        - Buyer Order Number
-        - Purchase Order Number or PO number  (if available) 
-            - Extract both handwritten and digital PO numbers and merge them into a single list of PO numbers or under the PO Number field.
-            - if multiple PO numbers are present, return them as a list of strings.
-            
+        Please analyze the provided invoice image using OCR technology and extract the following information in a structured JSON format:
+        Required Fields
 
+        -Invoice Number (also extract ACK NO if present, as Invoice Number)
+        -Invoice Date
+        -Due Date
+        -Vendor Name
+        -Vendor Address
+        -Customer/Client Name
+        -Customer/Client Address
+        -Line Items (including quantity, description, unit price, tax price, and total price)
+        -Subtotal
+        -Tax Amount
+        -Total Amount Due
+        -Payment Terms
+        -Payment Method (if available)
+        -Sales Order Number (if available)
+        -Purchase Order Number (also labeled as PO Number or Buyer Order Number)
 
-        
-        Return the results in a clean JSON format with these fields. If any field is not found in the image, 
-        set its value to null. Make sure the JSON is properly formatted and valid.
-        """
+        Extract all PO numbers, whether digital or handwritten. If multiple PO numbers exist, return them as a list
+        -Invoice URL (if available)
+        Special Instructions
+
+        -The invoice may contain both digital and handwritten text - extract both
+        -For fields with both digital and handwritten versions (like PO Numbers), combine all instances into a single list
+        -Return results in properly formatted JSON
+        -For any field not found in the image, set the value to null
+        Please ensure all relevant information is accurately extracted, regardless of format or placement within the invoice.
+    """
         
         try:
             # Call Gemini API with the image
