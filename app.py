@@ -115,6 +115,9 @@ class PDFInvoiceOCRParser:
         - Total Amount Due
         - Payment Terms
         - Payment Method (if available)
+        - Sales Order number (if available)
+        - Purchase Order Number (if available) — if multiple PO numbers are present, return them as a list of strings.
+
         
         Return the results in a clean JSON format with these fields. If any field is not found in the image, 
         set its value to null. Make sure the JSON is properly formatted and valid.
