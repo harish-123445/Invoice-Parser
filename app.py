@@ -118,6 +118,7 @@ class PDFInvoiceOCRParser:
         -Payment Terms
         -Payment Method (if available)
         -Sales Order Number (if available)
+        -Buyer Order Number (if available)
         -Purchase Order Number (also labeled as PO Number or Buyer Order Number)
 
         Extract all PO numbers, whether digital or handwritten. If multiple PO numbers exist, return them as a list
@@ -128,6 +129,8 @@ class PDFInvoiceOCRParser:
         -For fields with both digital and handwritten versions (like PO Numbers), combine all instances into a single list
         -Return results in properly formatted JSON
         -For any field not found in the image, set the value to null
+        -Don't map the same value to multiple fields
+        -If a field is not applicable, set it to null
         Please ensure all relevant information is accurately extracted, regardless of format or placement within the invoice.
     """
         
