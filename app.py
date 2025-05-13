@@ -102,7 +102,8 @@ class PDFInvoiceOCRParser:
         # Prepare the prompt for Gemini
         prompt = """
         Analyze this invoice image using OCR and extract the following information in a structured format:
-        - Invoice Number
+        - Invoice Number 
+            - if ACK NO return them as a Invoice Number
         - Invoice Date
         - Due Date
         - Vendor Name
@@ -116,7 +117,12 @@ class PDFInvoiceOCRParser:
         - Payment Terms
         - Payment Method (if available)
         - Sales Order number (if available)
-        - Purchase Order Number (if available) — if multiple PO numbers are present, return them as a list of strings.
+        - Buyer Order Number
+        - Purchase Order Number or PO number  (if available) 
+            - Extract both handwritten and digital PO numbers and merge them into a single list of PO numbers or under the PO Number field.
+            - if multiple PO numbers are present, return them as a list of strings.
+            
+
 
         
         Return the results in a clean JSON format with these fields. If any field is not found in the image, 
