@@ -43,7 +43,7 @@ class PDFInvoiceOCRParser:
         genai.configure(api_key=self.api_key)
         
         # Get the Gemini Vision model for image processing
-        self.model = genai.GenerativeModel('gemini-1.5-flash')
+        self.model = genai.GenerativeModel('gemini-2.0-flash')
         
         # Initialize token tracking
         self.total_input_tokens = 0
@@ -101,38 +101,56 @@ class PDFInvoiceOCRParser:
         
         # Prepare the prompt for Gemini
         prompt = """
-        Please analyze the provided invoice image using OCR technology and extract the following information in a structured JSON format:
-        Required Fields
+Please analyze the provided invoice image using OCR technology and extract the following information in a structured JSON format:
 
-        -Invoice Number
-        -Invoice Date
-        -Due Date
-        -Vendor Name
-        -Vendor Address
-        -Customer/Client Name
-        -Customer/Client Address
-        -Line Items (including quantity, description, unit price, tax price, and total price)
-        -Subtotal
-        -Tax Amount
-        -Total Amount Due
-        -Payment Terms
-        -Payment Method (if available)
-        -Sales Order Number (if available)
-        -Buyer Order Number (if available)
-        -Purchase Order Number (also labeled as PO Number)
+Required Fields
 
-        Extract all PO numbers, whether digital or handwritten. If multiple PO numbers exist, return them as a list
-        -Invoice URL (if available)
-        Special Instructions
+- Invoice Number
+- Invoice Date
+- Due Date
+- Vendor Name
+- Vendor Address
+- Customer/Client Name
+- Customer/Client Address
+- Line Items (including quantity, description, unit price, tax price, and total price)
+- Subtotal
+- Tax Amount
+- Total Amount Due
+- Payment Terms
+- Payment Method (if available)
+- Sales Order Number (if available)
+- Buyer Order Number (if available)
+- Purchase Order Number (also labeled as PO Number)
 
-        -The invoice may contain both digital and handwritten text - extract both
-        -For fields with both digital and handwritten versions (like PO Numbers), combine all instances into a single list
-        -Return results in properly formatted JSON
-        -For any field not found in the image, set the value to null
-        -Don't map the same value to multiple fields
-        -If a field is not applicable, set it to null
-        Please ensure all relevant information is accurately extracted, regardless of format or placement within the invoice.
-    """
+PO Number Extraction Rules
+- DO NOT take "NO" as PO number, Remove the value from PO Number field.
+- If a Date is found in the "PO Number" column, Remove the value date.
+- PO numbers manually entered (handwritten) should be prioritized.
+- Do not fetch the PO number based on the Sales Order Number.
+- PO numbers are not a floating point number, so do not include any decimal points.
+- Extract all PO numbers, whether digital or handwritten. If multiple PO numbers exist, return them as a list.
+- Do NOT include any value that resembles a date in the list of PO numbers.
+- Specifically, exclude any values that match common date formats such as:
+        - dd.mm.yyyy
+
+        - dd/mm/yyyy
+
+        - yyyy-mm-dd
+
+        - mm-dd-yyyy
+
+        - dd-mm-yy
+
+Special Instructions
+- The invoice may contain both digital and handwritten text - extract both. 
+- Return results in properly formatted JSON.
+- For any field not found in the image, set the value to null.
+- Don't map the same value to multiple fields.
+- If a field is not applicable, set it to null.
+- Invoice URL (if available)
+
+Please ensure all relevant information is accurately extracted, regardless of format or placement within the invoice.
+"""
         
         try:
             # Call Gemini API with the image
@@ -385,4 +403,4 @@ if __name__ == '__main__':
     
     # Start the Flask server
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=False)
+    app.run(host='0.0.0.0', port=port, debug=True)
