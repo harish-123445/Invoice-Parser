@@ -101,10 +101,9 @@ class PDFInvoiceOCRParser:
         
         # Prepare the prompt for Gemini
         prompt = """
-Please analyze the provided invoice image using OCR technology and extract the following information in a structured JSON format:
+Please analyze the provided invoice image using OCR and extract the information in a structured JSON format.
 
-Required Fields
-
+Required Standard Fields:
 - Invoice Number
 - Invoice Date
 - Due Date
@@ -112,7 +111,7 @@ Required Fields
 - Vendor Address
 - Customer/Client Name
 - Customer/Client Address
-- Line Items (including quantity, description, unit price, tax price, and total price)
+- Line Items (quantity, description, unit price, tax price, and total price)
 - Subtotal
 - Tax Amount
 - Total Amount Due
@@ -122,13 +121,18 @@ Required Fields
 - Buyer Order Number (if available)
 - Purchase Order Number (also labeled as PO Number)
 
-PO Number Extraction Rules
+Purchase Order Number Rules:
+- Only extract if explicitly labeled as "Purchase Order", "PO No", or "PO Number".
 - DO NOT take "NO" as PO number, Remove the value from PO Number field.
 - If a Date is found in the "PO Number" column, Remove the value date.
 - PO numbers manually entered (handwritten) should be prioritized.
 - Do not fetch the PO number based on the Sales Order Number.
 - PO numbers are not a floating point number, so do not include any decimal points.
 - Extract all PO numbers, whether digital or handwritten. If multiple PO numbers exist, return them as a list.
+- DO NOT take "Work Order Number", "Challan Number", or similar fields as PO numbers.
+- DO NOT include values that look like dates or decimals.
+- If multiple PO numbers exist, return them as a list.
+- If no PO number is present, return null.
 - Do NOT include any value that resembles a date in the list of PO numbers.
 - Specifically, exclude any values that match common date formats such as:
         - dd.mm.yyyy
@@ -139,18 +143,29 @@ PO Number Extraction Rules
 
         - mm-dd-yyyy
 
-        - dd-mm-yy
+        - dd-mm-yyyy
 
-Special Instructions
-- The invoice may contain both digital and handwritten text - extract both. 
-- Return results in properly formatted JSON.
-- For any field not found in the image, set the value to null.
-- Don't map the same value to multiple fields.
+Handling Additional Fields:
+- If the invoice contains fields that are NOT part of the predefined list above,
+  DO NOT force them into an unrelated field.
+- Instead, create new top-level fields with their exact names as they appear in the invoice.
+  Example:
+  {
+    "Work Order Number": "610000210",
+    "Challan Number": "560000107"
+  }
+- These new fields should be placed at the same JSON hierarchy level as the predefined fields.
+
+Special Instructions:
+- The invoice may contain both printed and handwritten text. Extract both.
+- Return results in strictly valid JSON format.
+- For any field not found, set the value to null.
+- Do not map the same value to multiple fields.
 - If a field is not applicable, set it to null.
 - Invoice URL (if available)
-
-Please ensure all relevant information is accurately extracted, regardless of format or placement within the invoice.
+- Ensure every extracted key exactly represents its true meaning in the invoice.
 """
+
         
         try:
             # Call Gemini API with the image
